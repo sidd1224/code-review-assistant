@@ -1,5 +1,11 @@
 package com.internship.codereview.util;
 
+import lombok.Data;
+import lombok.Getter;
+import org.springframework.stereotype.Component;
+
+@Getter
+@Component
 public class PromptUtil {
     private String prompTemplate="You are a senior software engineer performing a professional code review.\n" +
             "\n" +

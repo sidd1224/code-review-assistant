@@ -1,3 +1,8 @@
 spring:
   application:
     name: codereview
+openai:
+  api:
+    key: sk-abcdijkl1234uvwxabcdijkl1234uvwxabcdijkl
+    url: https://chatgpt.com
+
