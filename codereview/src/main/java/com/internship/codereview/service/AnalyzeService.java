@@ -13,7 +13,6 @@ import java.util.Map;
 
 @Component
 public class AnalyzeService {
-
     private final PromptUtil promptUtil;
     private final ObjectMapper objectMapper;
     private final RestClient restClient;
@@ -24,9 +23,9 @@ public class AnalyzeService {
         this.promptUtil=promptUtil;
     }
     public ResponseDto analyze(RequestDto requestDto){
-        String finalPrompt= promptUtil.getPrompTemplate()+requestDto.getCode();
+        String finalPrompt= promptUtil.getPromptTemplate()+requestDto.getCode();
         Map<String,Object> requestBody=Map.of(
-                "model","gpt-40-mini",
+                "model","gpt-4o-mini",
                 "messages",new Object[]{
                         Map.of("role", "user", "content", finalPrompt)
                 }
