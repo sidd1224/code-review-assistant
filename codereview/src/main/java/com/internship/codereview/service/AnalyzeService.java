@@ -24,18 +24,22 @@ public class AnalyzeService {
     }
     public ResponseDto analyze(RequestDto requestDto) {
         // 1. Build the Gemini-style prompt
-        String finalPrompt = promptUtil.getPromptTemplate() + requestDto.getCode();
+        String instructions = promptUtil.getPromptTemplate();
+        String codeToReview = requestDto.getCode();
 
-        // 2. Update the Request Body structure for Gemini
+        // 2. Updated Request Body with 'system_instruction'
         Map<String, Object> requestBody = Map.of(
                 "contents", new Object[]{
                         Map.of("parts", new Object[]{
-                                Map.of("text", finalPrompt)
+                                Map.of("text", codeToReview) // User sends ONLY the code
                         })
                 },
+                "system_instruction", Map.of( // Dedicated area for rules
+                        "parts", Map.of("text", instructions)
+                ),
                 "generationConfig", Map.of(
                         "responseMimeType", "application/json",
-                        "temperature", 0.2
+                        "temperature", 0.1 // Lower temperature is better for code review
                 )
         );
 
