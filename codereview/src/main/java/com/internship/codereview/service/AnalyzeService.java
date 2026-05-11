@@ -45,7 +45,7 @@ public class AnalyzeService {
 
         // 3. Update the endpoint (Ensure your config uses the Gemini Base URL)
         String rawJsonResponse = restClient.post()
-                .uri("/models/gemini-1.5-flash:generateContent")
+                .uri("/models/gemini-2.5-flash:generateContent")
                 .body(requestBody)
                 .retrieve()
                 .body(String.class);
