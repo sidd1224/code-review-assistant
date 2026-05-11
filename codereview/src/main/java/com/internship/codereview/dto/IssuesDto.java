@@ -9,5 +9,5 @@ public class IssuesDto {
     @NonNull
   private String problem;
     @NonNull
-  private String suggestions;
+  private String suggestion;
 }

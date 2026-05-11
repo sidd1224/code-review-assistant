@@ -20,7 +20,7 @@ public class ExternalAPIConfig {
 
         return RestClient.builder()
                 .baseUrl(baseUrl)
-                .defaultHeader("Authorization","Bearer " + apiKey)
+                .defaultHeader("x-goog-api-key", apiKey)
                 .defaultHeader("Content-Type","application/json")
                 .build();
     }

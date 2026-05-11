@@ -22,37 +22,49 @@ public class AnalyzeService {
         this.restClient=restClient;
         this.promptUtil=promptUtil;
     }
-    public ResponseDto analyze(RequestDto requestDto){
-        String finalPrompt= promptUtil.getPromptTemplate()+requestDto.getCode();
-        Map<String,Object> requestBody=Map.of(
-                "model","gpt-4o-mini",
-                "messages",new Object[]{
-                        Map.of("role", "user", "content", finalPrompt)
-                }
-                ,"temperature", 0.2,
-                "response_format",Map.of("type","json_object")
-                );
-        String rawJsonResponse=restClient.post()
-                .uri("/chat/completions/")
+    public ResponseDto analyze(RequestDto requestDto) {
+        // 1. Build the Gemini-style prompt
+        String finalPrompt = promptUtil.getPromptTemplate() + requestDto.getCode();
+
+        // 2. Update the Request Body structure for Gemini
+        Map<String, Object> requestBody = Map.of(
+                "contents", new Object[]{
+                        Map.of("parts", new Object[]{
+                                Map.of("text", finalPrompt)
+                        })
+                },
+                "generationConfig", Map.of(
+                        "responseMimeType", "application/json",
+                        "temperature", 0.2
+                )
+        );
+
+        // 3. Update the endpoint (Ensure your config uses the Gemini Base URL)
+        String rawJsonResponse = restClient.post()
+                .uri("/models/gemini-1.5-flash:generateContent")
                 .body(requestBody)
                 .retrieve()
                 .body(String.class);
+
         String content = extractChoicesFromAIResponse(rawJsonResponse);
+
         try {
-            // readValue takes the JSON string and maps it to the fields in your ResponseDto.java
             return objectMapper.readValue(content, ResponseDto.class);
         } catch (Exception e) {
-            // If the AI returns malformed JSON or missing fields, this catch block handles the error
-            throw new RuntimeException("Error parsing AI JSON response", e);
+            throw new RuntimeException("Error parsing Gemini JSON response", e);
         }
+    }
 
-    }
-    public String extractChoicesFromAIResponse(String rawJsonResponse){
-    try{
-        JsonNode root= objectMapper.readTree(rawJsonResponse);
-        return root.path("choices").get(0).path("message").path("content").asString();
-    }catch(Exception e){
-        throw new RuntimeException("Failed to Extract AI response"+e);
-    }
+    public String extractChoicesFromAIResponse(String rawJsonResponse) {
+        try {
+            JsonNode root = objectMapper.readTree(rawJsonResponse);
+            // 4. Update the JSON path: candidates -> content -> parts -> text
+            return root.path("candidates").get(0)
+                    .path("content")
+                    .path("parts").get(0)
+                    .path("text").asString(); // Changed .asString() to .asText()
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to Extract Gemini response: " + e.getMessage());
+        }
     }
 }

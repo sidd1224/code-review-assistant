@@ -10,4 +10,5 @@ import java.util.List;
 public class ResponseDto {
     @NonNull
     private List<IssuesDto> issues;
+    private String improvedCode;
 }
